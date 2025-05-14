@@ -125,11 +125,11 @@ void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz){
  *
  */
 template <typename Type, int grado>
-void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int hindiceHijo) {
+void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int indiceHijo) {
     int minClaves = (grado * 2 ) / 3; // minimo de claves por nodo
 
-    // Solo si el nodo a dividir es la raíz
-    if (subraiz == raiz && raiz->elemNodo == grado) {
+    // Solo si el nodo a dividir es la raíz, es hoja y esta llena
+    if (subraiz == raiz && raiz->elemNodo == grado && EsHoja(subraiz)) {
         Nodo* nuevaRaiz = new Nodo();
         Nodo* nuevoHijo = new Nodo();
 
@@ -151,7 +151,11 @@ void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int hindiceHijo) {
         nuevaRaiz->hijo[0] = nuevoHijo;
         raiz = nuevaRaiz;
         
+    }else if(subraiz == raiz && !EsHoja(subraiz) && subraiz->elemNodo == grado){
+        
     }
+
+    //}
 }
 
 
