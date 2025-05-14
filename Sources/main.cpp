@@ -1,17 +1,20 @@
 #include "../Headers/StarBTree.hpp"
 #include <ostream>
 
+using namespace std;
+
 int main() {
     StarBTree<int, 5> arbol;
 
-    for(int i = 500 ; i > 0 ;){
-        std::cout << "Agregando el valor : " << i << std::endl;
+    for(int i = 1 ; i <= 8 ; ++i){
+        cout << "Agregando el valor : " << i << endl;
         arbol.Agregar(i);
         arbol.ImprimirNiveles();
-        i = i - 100;
+        cout << "-------------------------" << endl;
+        //i = i + 100;
     }
 
-    //arbol.ImprimirNiveles();
+    arbol.ImprimirNiveles();
 
     return 0;
 }

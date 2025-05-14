@@ -114,7 +114,7 @@ void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz){
         Agregar(valor, subraiz->hijo[i]);
         
         if(subraiz->hijo[i]->elemNodo == grado) {
-            //dividirNodo(subraiz, i);
+            OrdenarNodo(subraiz, i);
             //std::cout << "El nodo se lleno" << std::endl;
         }
     }
@@ -126,25 +126,36 @@ void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz){
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int hindiceHijo) {
-    int minClaves = (grado / 3) * 2;
+    int minClaves = (grado * 2 ) / 3; // minimo de claves por nodo
 
-    // Caso 1, la raiz esta llena
-    if(subraiz == raiz){
-        Nodo* nodo = new Nodo();
-        for(int i = minClaves + 1 ; i < grado ; ++i){
-            nodo->claves[i - minClaves] = subraiz->claves[i];
-            nodo->hijo[i - minClaves] = subraiz->hijo[i];
-            nodo->elemNodo++;
-            subraiz->claves[i] = Type();
-            subraiz->elemNodo--;
+    // Solo si el nodo a dividir es la raíz
+    if (subraiz == raiz && raiz->elemNodo == grado) {
+        Nodo* nuevaRaiz = new Nodo();
+        Nodo* nuevoHijo = new Nodo();
+
+        for(int i = 0 ; i < minClaves ; ++i){
+            nuevoHijo->claves[i] = subraiz->claves[i];
+            nuevoHijo->elemNodo++;
+            nuevoHijo->hijo[i] = subraiz->hijo[i];
         }
-        //nodo->hijo[] = subraiz->hijo[grado];
 
-        raiz = nodo;
-        raiz->hijo[0] = subraiz;
-        raiz->hijo[1] = subraiz->hijo[grado];
+        for(int i = minClaves ; i < grado ; ++i){
+            nuevaRaiz->claves[i - minClaves] = subraiz->claves[i];
+            nuevaRaiz->elemNodo++;
+            nuevaRaiz->hijo[i - minClaves + 1] = subraiz->hijo[i];
+        }
+
+        nuevaRaiz->hijo[grado] = subraiz->hijo[grado];
+
+        delete subraiz;
+        nuevaRaiz->hijo[0] = nuevoHijo;
+        raiz = nuevaRaiz;
+        
     }
 }
+
+
+
 
 
 
