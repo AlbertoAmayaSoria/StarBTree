@@ -301,4 +301,4 @@ int StarBTree<Type, grado>::CantElem() const {
     return cantElem;
 }
 
-// Prueba commit
+// Prueba commit2
