@@ -41,6 +41,11 @@ private:
     Nodo* CopiarArbol(Nodo* subraiz);
     void Agregar(Type valor, Nodo* subraiz);
 
+    bool EsHoja(Nodo* nodo) const;
+    void Vaciar(Nodo* nodo);
+
+
+    void OrdenarNodo(Nodo* subraiz, int indiceHijo);
 
     // Métodos para impresión
     void ImprimirAsc(Nodo* nodo) const;
@@ -50,4 +55,4 @@ private:
 
 #include "../Templates/StarBTree.tpp"
 
-#endif // StarBTree_HPP_INCLUDED
+#endif // STARBTREE_HPP_INCLUDED
