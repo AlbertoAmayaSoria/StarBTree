@@ -245,7 +245,10 @@ void StarBTree<Type, grado>::Redistribuir(Nodo* padre, int indiceHijo) {
 template <typename Type, int grado>
 void StarBTree<Type, grado>::DividirTriple(Nodo* padre, int indiceHijo) {
     std::cout<< "Diviscion triple" << std::endl;
-    Nodo* h = padre->hijo[indiceHijo];
+    
+    Nodo* hijo = 
+
+    /*Nodo* h = padre->hijo[indiceHijo];
     int m = grado;
     // escoger hermano lleno (izq o der)
     bool canLeft = (indiceHijo > 0 && padre->hijo[indiceHijo - 1]->elemNodo == m);
@@ -287,7 +290,7 @@ void StarBTree<Type, grado>::DividirTriple(Nodo* padre, int indiceHijo) {
         delete S; delete T;
     } else {
         delete h; delete T;
-    }
+    }*/
 }
 
 
