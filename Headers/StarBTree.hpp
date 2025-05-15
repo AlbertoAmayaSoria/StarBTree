@@ -46,6 +46,8 @@ private:
 
 
     void OrdenarNodo(Nodo* subraiz, int indiceHijo);
+    void Redistribuir(Nodo* subraiz, int indiceHijo);
+    void DividirTriple(Nodo* subraiz, int indiceHijo);
 
     // Métodos para impresión
     void ImprimirAsc(Nodo* nodo) const;
