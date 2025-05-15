@@ -40,11 +40,11 @@ private:
     // Métodos auxiliares privados
     Nodo* CopiarArbol(Nodo* subraiz);
     void Agregar(Type valor, Nodo* subraiz);
-
-    bool EsHoja(Nodo* nodo) const;
+    void Eliminar(Type valor, Nodo* subraiz);
     void Vaciar(Nodo* nodo);
 
-
+    // Complementos para Agregar y Eliminar
+    bool EsHoja(Nodo* nodo) const;
     void OrdenarNodo(Nodo* subraiz, int indiceHijo);
     void Redistribuir(Nodo* subraiz, int indiceHijo);
     void DividirTriple(Nodo* subraiz, int indiceHijo);
