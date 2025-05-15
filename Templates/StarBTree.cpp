@@ -246,7 +246,7 @@ template <typename Type, int grado>
 void StarBTree<Type, grado>::DividirTriple(Nodo* padre, int indiceHijo) {
     std::cout<< "Diviscion triple" << std::endl;
     
-    Nodo* hijo = 
+    //Nodo* hijo = 
 
     /*Nodo* h = padre->hijo[indiceHijo];
     int m = grado;
