@@ -6,7 +6,7 @@ using namespace std;
 int main() {
     StarBTree<int, 4> arbol;
 
-    for(int i = 1 ; i <= 9 ; ++i){
+    for(int i = 1 ; i <= 25 ; ++i){
         cout << "Agregando el valor : " << i << endl;
         arbol.Agregar(i);
         //arbol.ImprimirNiveles();
