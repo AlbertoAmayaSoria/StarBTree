@@ -5,14 +5,15 @@
 #include "../Headers/StarBTree.hpp"
 
 /**
- * @file StarBTree.hpp
- * @brief Implementación de un Árbol B genérico con operaciones básicas.
- * @tparam Type Tipo de datos almacenados.
- * @tparam grado Grado máximo del árbol (máximo de claves por nodo).
+ * @file StarBTree.tpp
+ * @brief Implementación de las operaciones de un Árbol B* genérico (StarBTree).
+ * @details Soporta inserción con redistribución, división triple y lógica especial para la raíz.
+ * @tparam Type Tipo de los elementos almacenados en el árbol.
+ * @tparam grado Grado del árbol (número máximo de claves por nodo excepto la raíz).
  */
 
 /**
- * @brief Constructor por defecto del Árbol B.
+ * @brief Constructor por defecto del Árbol B*.
  */
 template <typename Type, int grado>
 StarBTree<Type, grado>::StarBTree() : cantElem(0), raiz(nullptr) {}
@@ -21,15 +22,15 @@ StarBTree<Type, grado>::StarBTree() : cantElem(0), raiz(nullptr) {}
 
 /**
  * @brief Constructor por copia.
- * @param c Árbol B a copiar.
+ * @param c Árbol B* a copiar.
  */
 template <typename Type, int grado>
 StarBTree<Type, grado>::StarBTree(const StarBTree &c) : raiz(CopiarArbol(c.raiz)), cantElem(c.cantElem) {}
 
 /**
- * @brief Operador de asignación.
- * @param c Árbol B a asignar.
- * @return Referencia al árbol actual.
+ * @brief Operador de asignación por copia.
+ * @param c Árbol B* a asignar.
+ * @return Referencia al objeto actual.
  */
 template <typename Type, int grado>
 StarBTree<Type, grado>& StarBTree<Type, grado>::operator=(const StarBTree &c) {
@@ -42,7 +43,7 @@ StarBTree<Type, grado>& StarBTree<Type, grado>::operator=(const StarBTree &c) {
 }
 
 /**
- * @brief Destructor del Árbol B.
+ * @brief Destructor del Árbol B*.
  */
 template <typename Type, int grado>
 StarBTree<Type, grado>::~StarBTree() {
@@ -73,8 +74,9 @@ typename StarBTree<Type, grado>::Nodo* StarBTree<Type, grado>::CopiarArbol(Nodo*
 }
 
 /**
- * @brief Agrega un elemento al árbol.
+ * @brief Inserta un nuevo valor en el árbol.
  * @param valor Valor a insertar.
+ * @note Si el valor ya existe, no se inserta.
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Agregar(Type valor){
@@ -89,9 +91,9 @@ void StarBTree<Type, grado>::Agregar(Type valor){
 }
 
 /**
- * @brief Insertar recursivamente un valor en un subárbol.
+ * @brief Inserta recursivamente un valor en el subárbol dado.
  * @param valor Valor a insertar.
- * @param subraíz Nodo raíz del subárbol
+ * @param subraiz Puntero al nodo raíz del subárbol donde insertar.
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz){
@@ -129,9 +131,10 @@ void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz){
 }
 
 /**
- *
+ * @brief Reorganiza o divide un nodo que ha alcanzado su capacidad máxima.
+ * @param subraiz Nodo padre del hijo lleno.
+ * @param indiceHijoHijo Índice del hijo que está lleno.
  */
-
 template <typename Type, int grado>
 void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int indiceHijoHijo) {
     // caso raíz hoja
@@ -183,10 +186,11 @@ void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int indiceHijoHijo) {
     }
 }
 
-
-
-
-
+/**
+ * @brief Intenta redistribuir claves entre hermanos antes de dividir.
+ * @param padre Nodo padre.
+ * @param indiceHijo Índice del hijo que está lleno.
+ */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Redistribuir(Nodo* padre, int indiceHijo) {
     std::cout << "Redistribucion" << std::endl;
@@ -261,6 +265,11 @@ void StarBTree<Type, grado>::Redistribuir(Nodo* padre, int indiceHijo) {
     DividirTriple(padre, indiceHijo);
 }
 
+/**
+ * @brief Realiza una división triple en un nodo y sus hermanos.
+ * @param padre Nodo padre.
+ * @param indiceHijo Índice del hijo medio a dividir.
+ */
 
 template <typename Type, int grado>
 void StarBTree<Type, grado>::DividirTriple(Nodo* padre, int indiceHijo) {
@@ -365,15 +374,13 @@ void StarBTree<Type, grado>::DividirTriple(Nodo* padre, int indiceHijo) {
 }
 
 
-
-
-
-
-
-
-
 /**
  * @brief Verifica si un nodo es hoja.
+ * 
+ * Un nodo es hoja si todos sus hijos son nulos.
+ * 
+ * @tparam Type Tipo de dato almacenado en el árbol.
+ * @tparam grado Grado del árbol B*.
  * @param nodo Nodo a verificar.
  * @return true si es hoja, false en caso contrario.
  */
@@ -388,12 +395,26 @@ bool StarBTree<Type, grado>::EsHoja(Nodo* nodo) const {
     return true;
 }
 
-
+/**
+ * @brief Busca un valor en el árbol.
+ * 
+ * @tparam Type Tipo de dato almacenado en el árbol.
+ * @tparam grado Grado del árbol B*.
+ * @param valor Valor a buscar.
+ * @return true si el valor se encuentra en el árbol, false en caso contrario.
+ */
 template <typename Type, int grado>
 bool StarBTree<Type, grado>::Buscar(Type valor) const {
     return Buscar(valor, raiz);
 }
 
+/**
+ * @brief Función auxiliar recursiva para buscar un valor.
+ * 
+ * @param valor Valor a buscar.
+ * @param subraiz Subárbol en el que se realiza la búsqueda.
+ * @return true si el valor se encuentra, false en caso contrario.
+ */
 template <typename Type, int grado>
 bool StarBTree<Type, grado>::Buscar(Type valor, Nodo* subraiz) const {
     if(subraiz == nullptr) return false;
@@ -410,59 +431,41 @@ bool StarBTree<Type, grado>::Buscar(Type valor, Nodo* subraiz) const {
     return Buscar(valor, subraiz->hijo[i]);
 }
 
+/**
+ * @brief Elimina todos los elementos del árbol.
+ * 
+ * Libera toda la memoria dinámica y reinicia el árbol.
+ */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Vaciar() {
     Vaciar(raiz);
-    raiz = nullptr;  // Importante resetear la raíz
-    cantElem = 0;    // Resetear el contador de elementos
+    raiz = nullptr;  ///< Importante resetear la raíz
+    cantElem = 0;    ///< Resetear el contador de elementos
 }
 
 /**
- * @brief Elimina todos los elementos del árbol de forma recursiva
- * @param nodo Nodo actual a eliminar
+ * @brief Elimina todos los nodos del subárbol de forma recursiva.
+ * 
+ * @param nodo Nodo raíz del subárbol a eliminar.
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Vaciar(Nodo* nodo) {
     if (nodo == nullptr) return;
 
-    // Primero vaciamos recursivamente los hijos si no es hoja
-    if (!EsHoja(nodo)) {  // Usamos el miembro directo en lugar de EsHoja()
+    if (!EsHoja(nodo)) {
         for (int i = 0; i <= nodo->elemNodo; ++i) {
             Vaciar(nodo->hijo[i]);
-            nodo->hijo[i] = nullptr;  // Marcamos como nullptr después de liberar
+            nodo->hijo[i] = nullptr;
         }
     }
 
-    // Eliminamos el nodo actual
     delete nodo;
-    // No necesitamos nodo = nullptr aquí porque es una copia local del puntero
-    // Tampoco decrementamos cantElem aquí, se resetea en la función pública
 }
 
 /**
- * @brief Elimina recursivamente los nodos desde uno dado.
- * @param nodo Nodo raíz del subárbol a eliminar.
- */
-/*template <typename Type, int grado>
-void StarBTree<Type, grado>::Vaciar(Nodo* nodo) {
-    if(nodo == nullptr) return;
-    
-    if(!EsHoja(nodo)) {
-        for(int i = 0; i <= nodo->elemNodo; ++i) {
-            Vaciar(nodo->hijo[i]);
-        }
-    }
-    
-    delete nodo;
-}*/
-
-/*template <typename Type, int grado>
-void StarBTree<Type, grado>::Vaciar(){
-    Vaciar(raiz);
-}*/
-
-/**
  * @brief Imprime los elementos del árbol en orden ascendente.
+ * 
+ * Utiliza recorrido en orden (in-order).
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::ImprimirAsc() const {
@@ -471,8 +474,9 @@ void StarBTree<Type, grado>::ImprimirAsc() const {
 }
 
 /**
- * @brief Imprime recursivamente en orden ascendente.
- * @param nodo Nodo desde donde imprimir.
+ * @brief Función auxiliar recursiva para imprimir en orden ascendente.
+ * 
+ * @param nodo Nodo desde donde se inicia la impresión.
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::ImprimirAsc(Nodo* nodo) const {
@@ -487,6 +491,8 @@ void StarBTree<Type, grado>::ImprimirAsc(Nodo* nodo) const {
 
 /**
  * @brief Imprime los elementos del árbol en orden descendente.
+ * 
+ * Utiliza recorrido inverso (reverse in-order).
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::ImprimirDes() const {
@@ -495,8 +501,9 @@ void StarBTree<Type, grado>::ImprimirDes() const {
 }
 
 /**
- * @brief Imprime recursivamente en orden descendente.
- * @param nodo Nodo desde donde imprimir.
+ * @brief Función auxiliar recursiva para imprimir en orden descendente.
+ * 
+ * @param nodo Nodo desde donde se inicia la impresión.
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::ImprimirDes(Nodo* nodo) const {
@@ -511,6 +518,8 @@ void StarBTree<Type, grado>::ImprimirDes(Nodo* nodo) const {
 
 /**
  * @brief Imprime el árbol por niveles (recorrido por amplitud).
+ * 
+ * Imprime cada nivel del árbol en una línea, útil para ver la estructura.
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::ImprimirNiveles() const {
@@ -545,10 +554,12 @@ void StarBTree<Type, grado>::ImprimirNiveles() const {
     }
 }
 
-// Método para obtener cantidad de elementos
+/**
+ * @brief Devuelve la cantidad total de elementos en el árbol.
+ * 
+ * @return Número de elementos insertados actualmente en el árbol.
+ */
 template <typename Type, int grado>
 int StarBTree<Type, grado>::CantElem() const {
     return cantElem;
 }
-
-
