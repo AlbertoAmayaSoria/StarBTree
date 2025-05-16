@@ -10,7 +10,7 @@ public:
     StarBTree& operator=(const StarBTree &c); // Operador asignación
 
     void Agregar(Type valor); // Agrega un nuevo elemento
-    void Eliminar(Type valor); // Elimina el primer elemento con este valor
+    //void Eliminar(Type valor); // Elimina el primer elemento con este valor
 
     bool Buscar(Type valor) const; // Busca un elemento en el árbol
     int CantElem() const; // Devuelve la cantidad de elementos actuales
@@ -39,7 +39,7 @@ private:
     // Métodos auxiliares privados
     Nodo* CopiarArbol(Nodo* subraiz);
     void Agregar(Type valor, Nodo* subraiz);
-    void Eliminar(Type valor, Nodo* subraiz);
+    //void Eliminar(Type valor, Nodo* subraiz);
     void Vaciar(Nodo* nodo);
     bool Buscar(Type valor, Nodo* subraiz) const;
 
