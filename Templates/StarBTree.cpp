@@ -78,7 +78,10 @@ typename StarBTree<Type, grado>::Nodo* StarBTree<Type, grado>::CopiarArbol(Nodo*
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Agregar(Type valor){
-    if (raiz == nullptr) raiz = new Nodo(/*true, true*/);  // raíz y hoja
+    if (raiz == nullptr){
+        raiz = new Nodo(true);  // raíz y hoja
+        raiz->esRaiz = true; 
+    }
 
     Agregar(valor, raiz);
 }

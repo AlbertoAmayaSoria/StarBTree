@@ -26,14 +26,31 @@ private:
     int cantElem;
     struct Nodo {
         int elemNodo;
-        Type claves[grado];
+        bool esRaiz;
+        Type* claves;
+        Nodo** hijo;
+    
+        Nodo(bool esRaiz = false) : elemNodo(0), esRaiz(esRaiz){
+            int capacidad = esRaiz ? grado * 2 : grado;
+            claves = new Type[capacidad];
+            hijo = new Nodo*[capacidad + 1];
+            for(int i = 0; i <= capacidad; ++i) {
+                hijo[i] = nullptr;
+            }
+
+        ~Nodo() {
+        delete[] claves;
+        delete[] hijo;
+
+        }
+        /*Type claves[grado];
         Nodo* hijo[grado + 1];
         
         Nodo() : elemNodo(0) {
             for(int i = 0; i <= grado; ++i) {
                 hijo[i] = nullptr;
             }
-        }
+        }*/
     } *raiz;
 
     // Métodos auxiliares privados
