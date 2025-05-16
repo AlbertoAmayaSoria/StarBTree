@@ -24,7 +24,6 @@ public:
 
 private:
     int cantElem;
-
     struct Nodo {
         int elemNodo;
         Type claves[grado];

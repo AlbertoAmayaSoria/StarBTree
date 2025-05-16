@@ -17,6 +17,8 @@
 template <typename Type, int grado>
 StarBTree<Type, grado>::StarBTree() : cantElem(0), raiz(nullptr) {}
 
+
+
 /**
  * @brief Constructor por copia.
  * @param c Árbol B a copiar.
@@ -44,7 +46,7 @@ StarBTree<Type, grado>& StarBTree<Type, grado>::operator=(const StarBTree &c) {
  */
 template <typename Type, int grado>
 StarBTree<Type, grado>::~StarBTree() {
-    Vaciar();
+    Vaciar(raiz);
 }
 
 /**
@@ -76,7 +78,8 @@ typename StarBTree<Type, grado>::Nodo* StarBTree<Type, grado>::CopiarArbol(Nodo*
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Agregar(Type valor){
-    if(raiz == nullptr) raiz = new Nodo();
+    if (raiz == nullptr) raiz = new Nodo(/*true, true*/);  // raíz y hoja
+
     Agregar(valor, raiz);
 }
 
@@ -247,53 +250,104 @@ void StarBTree<Type, grado>::Redistribuir(Nodo* padre, int indiceHijo) {
 
 template <typename Type, int grado>
 void StarBTree<Type, grado>::DividirTriple(Nodo* padre, int indiceHijo) {
-    std::cout<< "Division triple" << std::endl;
+    std::cout << "=== DIVISIÓN TRIPLE ===" << std::endl;
 
-    //Nodo* aux = 
+    Nodo* medio = padre->hijo[indiceHijo];
+    Nodo* izquierdo = (indiceHijo > 0) ? padre->hijo[indiceHijo - 1] : nullptr;
+    Nodo* derecho = (indiceHijo < padre->elemNodo) ? padre->hijo[indiceHijo + 1] : nullptr;
 
-    /*Nodo* h = padre->hijo[indiceHijo];
-    int m = grado;
-    // escoger hermano lleno (izq o der)
-    bool canLeft = (indiceHijo > 0 && padre->hijo[indiceHijo - 1]->elemNodo == m);
-    bool canRight = (indiceHijo < padre->elemNodo && padre->hijo[indiceHijo + 1]->elemNodo == m);
+    // Escoger hermano para fusionar
+    bool usarIzquierdo = (izquierdo && izquierdo->elemNodo == grado);
+    bool usarDerecho = (derecho && derecho->elemNodo == grado);
 
-    int pivotParent = canLeft ? indiceHijo - 1 : indiceHijo;
-    Nodo* S = canLeft ? padre->hijo[indiceHijo - 1] : h;
-    Nodo* T = canLeft ? h : padre->hijo[indiceHijo + 1];
+    int posFusion = -1;
+    Nodo *A, *B, *C; // nuevos nodos
+    std::vector<Type> fusion;
+    std::vector<Nodo*> fusionHijos;
 
-    // fusionar S + clavePadre + T
-    std::vector<Type> vec;
-    for (int i = 0; i < S->elemNodo; ++i) vec.push_back(S->claves[i]);
-    vec.push_back(padre->claves[pivotParent]);
-    for (int i = 0; i < T->elemNodo; ++i) vec.push_back(T->claves[i]);
+    if (usarIzquierdo) {
+        posFusion = indiceHijo - 1;
+        for (int i = 0; i < izquierdo->elemNodo; ++i)
+            fusion.push_back(izquierdo->claves[i]);
+        fusion.push_back(padre->claves[posFusion]);
+        for (int i = 0; i < medio->elemNodo; ++i)
+            fusion.push_back(medio->claves[i]);
 
-    int total = vec.size();
-    int one = total / 3;
-    int two = total - one - 1;
+        if (!EsHoja(medio)) {
+            for (int i = 0; i <= izquierdo->elemNodo; ++i)
+                fusionHijos.push_back(izquierdo->hijo[i]);
+            for (int i = 0; i <= medio->elemNodo; ++i)
+                fusionHijos.push_back(medio->hijo[i]);
+        }
+    } else if (usarDerecho) {
+        posFusion = indiceHijo;
+        for (int i = 0; i < medio->elemNodo; ++i)
+            fusion.push_back(medio->claves[i]);
+        fusion.push_back(padre->claves[posFusion]);
+        for (int i = 0; i < derecho->elemNodo; ++i)
+            fusion.push_back(derecho->claves[i]);
 
-    Nodo* A = new Nodo(); A->elemNodo = one;
-    Nodo* B = new Nodo(); B->elemNodo = two;
-    Type mid = vec[one];
-
-    for (int i = 0; i < one; ++i) A->claves[i] = vec[i];
-    for (int i = 0; i < two; ++i) B->claves[i] = vec[one + 1 + i];
-
-    // insertar mid en p
-    for (int j = padre->elemNodo; j > pivotParent; --j) {
-        padre->claves[j]  = padre->claves[j - 1];
-        padre->hijo[j + 1] = padre->hijo[j];
+        if (!EsHoja(medio)) {
+            for (int i = 0; i <= medio->elemNodo; ++i)
+                fusionHijos.push_back(medio->hijo[i]);
+            for (int i = 0; i <= derecho->elemNodo; ++i)
+                fusionHijos.push_back(derecho->hijo[i]);
+        }
+    } else {
+        std::cout << "No se puede dividir triple (no hay hermanos llenos)." << std::endl;
+        return;
     }
-    padre->claves[pivotParent] = mid;
-    padre->hijo[pivotParent] = A;
-    padre->hijo[pivotParent + 1] = B;
+
+    // Crear nodos
+    A = new Nodo();
+    B = new Nodo();
+    C = new Nodo();
+
+    int total = fusion.size();
+    int porcion = total / 3;
+
+    for (int i = 0; i < porcion; ++i)
+        A->claves[A->elemNodo++] = fusion[i];
+
+    padre->claves[posFusion] = fusion[porcion];
+
+    for (int i = porcion + 1; i < 2 * porcion + 1; ++i)
+        B->claves[B->elemNodo++] = fusion[i];
+
+    padre->claves[posFusion + 1] = fusion[2 * porcion + 1];
+
+    for (int i = 2 * porcion + 2; i < total; ++i)
+        C->claves[C->elemNodo++] = fusion[i];
+
+    // Si no son hojas, distribuir hijos
+    if (!fusionHijos.empty()) {
+        int idx = 0;
+        for (int i = 0; i <= A->elemNodo; ++i)
+            A->hijo[i] = fusionHijos[idx++];
+        for (int i = 0; i <= B->elemNodo; ++i)
+            B->hijo[i] = fusionHijos[idx++];
+        for (int i = 0; i <= C->elemNodo; ++i)
+            C->hijo[i] = fusionHijos[idx++];
+    }
+
+    // Desplazar claves y punteros en padre
+    for (int i = padre->elemNodo; i > posFusion + 1; --i) {
+        padre->claves[i] = padre->claves[i - 1];
+        padre->hijo[i + 1] = padre->hijo[i];
+    }
     padre->elemNodo++;
 
-    // liberar viejos
-    if (canLeft) {
-        delete S; delete T;
+    padre->hijo[posFusion]     = A;
+    padre->hijo[posFusion + 1] = B;
+    padre->hijo[posFusion + 2] = C;
+
+    if (usarIzquierdo) {
+        delete izquierdo;
+        delete medio;
     } else {
-        delete h; delete T;
-    }*/
+        delete medio;
+        delete derecho;
+    }
 }
 
 
@@ -320,21 +374,41 @@ bool StarBTree<Type, grado>::EsHoja(Nodo* nodo) const {
     return true;
 }
 
-/**
- * @brief Elimina todos los elementos del árbol.
- */
+
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Vaciar() {
     Vaciar(raiz);
-    raiz = nullptr;
-    cantElem = 0;
+    raiz = nullptr;  // Importante resetear la raíz
+    cantElem = 0;    // Resetear el contador de elementos
+}
+
+/**
+ * @brief Elimina todos los elementos del árbol de forma recursiva
+ * @param nodo Nodo actual a eliminar
+ */
+template <typename Type, int grado>
+void StarBTree<Type, grado>::Vaciar(Nodo* nodo) {
+    if (nodo == nullptr) return;
+
+    // Primero vaciamos recursivamente los hijos si no es hoja
+    if (!EsHoja(nodo)) {  // Usamos el miembro directo en lugar de EsHoja()
+        for (int i = 0; i <= nodo->elemNodo; ++i) {
+            Vaciar(nodo->hijo[i]);
+            nodo->hijo[i] = nullptr;  // Marcamos como nullptr después de liberar
+        }
+    }
+
+    // Eliminamos el nodo actual
+    delete nodo;
+    // No necesitamos nodo = nullptr aquí porque es una copia local del puntero
+    // Tampoco decrementamos cantElem aquí, se resetea en la función pública
 }
 
 /**
  * @brief Elimina recursivamente los nodos desde uno dado.
  * @param nodo Nodo raíz del subárbol a eliminar.
  */
-template <typename Type, int grado>
+/*template <typename Type, int grado>
 void StarBTree<Type, grado>::Vaciar(Nodo* nodo) {
     if(nodo == nullptr) return;
     
@@ -345,7 +419,12 @@ void StarBTree<Type, grado>::Vaciar(Nodo* nodo) {
     }
     
     delete nodo;
-}
+}*/
+
+/*template <typename Type, int grado>
+void StarBTree<Type, grado>::Vaciar(){
+    Vaciar(raiz);
+}*/
 
 /**
  * @brief Imprime los elementos del árbol en orden ascendente.
