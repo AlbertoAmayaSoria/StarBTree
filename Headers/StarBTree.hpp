@@ -44,7 +44,7 @@ private:
 
     // Complementos para Agregar y Eliminar
     bool EsHoja(Nodo* nodo) const;
-    void OrdenarNodo(Nodo* subraiz, int indiceHijo);
+    void OrdenarNodo(Nodo* subraiz/*, int indiceHijo*/);
     void Redistribuir(Nodo* subraiz, int indiceHijo);
     void DividirTriple(Nodo* subraiz, int indiceHijo);
 

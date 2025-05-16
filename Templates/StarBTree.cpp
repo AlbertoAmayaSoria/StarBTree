@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ostream>
 #include <queue>
 #include <cmath>
 #include <stdexcept>
@@ -106,7 +107,7 @@ void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz){
         // Si la hoja se llena, hay que reequilibrar
         if (subraiz->elemNodo == grado && subraiz == raiz) {
             std::cout << "El nodo esta lleno" << std::endl;
-            OrdenarNodo(subraiz, i + 1);
+            OrdenarNodo(raiz);
         }
     } else {
         // Elegir hijo adecuado
@@ -118,16 +119,74 @@ void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz){
         // Tras bajar, si ese hijo se llenó, reequilibrar
         if (subraiz->hijo[i]->elemNodo == grado) {
             std::cout << "Se lleno el nodo visitado" << std::endl;
-            OrdenarNodo(subraiz, i);
+            OrdenarNodo(raiz);
         }
     }
 }
+
+template <typename Type, int grado>
+void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz) {
+    if (!subraiz) return;
+
+    // Caso especial: raíz hoja llena
+    if (subraiz == raiz && EsHoja(subraiz) && subraiz->elemNodo == 2 * grado) {
+        std::cout << "Dividiendo la raíz hoja llena" << std::endl;
+
+        int minClaves = std::ceil((2.0 * grado) / 3.0) - 1;
+        int total = subraiz->elemNodo;
+        int clavesI = minClaves;
+        int clavesD = total - clavesI - 1;
+
+        Nodo* izquierdo = new Nodo();
+        Nodo* derecho = new Nodo();
+
+        for (int i = 0; i < clavesI; ++i) {
+            izquierdo->claves[i] = subraiz->claves[i];
+            izquierdo->elemNodo++;
+        }
+
+        for (int i = 0; i < clavesD; ++i) {
+            derecho->claves[i] = subraiz->claves[clavesI + 1 + i];
+            derecho->elemNodo++;
+        }
+
+        Type mid = subraiz->claves[clavesI];
+
+        Nodo* nueva = new Nodo();
+        nueva->claves[0] = mid;
+        nueva->elemNodo = 1;
+        nueva->hijo[0] = izquierdo;
+        nueva->hijo[1] = derecho;
+
+        delete subraiz;
+        raiz = nueva;
+        return;
+    }
+
+    // Caso general: recursivamente revisar hijos
+    if (!EsHoja(subraiz)) {
+        for (int i = 0; i <= subraiz->elemNodo; ++i) {
+            OrdenarNodo(subraiz->hijo[i]);
+
+            if (subraiz->hijo[i] && subraiz->hijo[i]->elemNodo == grado) {
+                std::cout << "Redistribuyendo hijo " << i << std::endl;
+                Redistribuir(subraiz, i);
+
+                if (subraiz->hijo[i]->elemNodo == grado) {
+                    std::cout << "Dividiendo triple hijo " << i << std::endl;
+                    DividirTriple(subraiz, i);
+                }
+            }
+        }
+    }
+}
+
 
 /**
  *
  */
 
-template <typename Type, int grado>
+/*template <typename Type, int grado>
 void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int indiceHijoHijo) {
     // caso raíz hoja
     if (subraiz == raiz && EsHoja(subraiz) && subraiz->elemNodo == grado) {
@@ -161,7 +220,7 @@ void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int indiceHijoHijo) {
         delete subraiz;
         raiz = nueva;
         return;
-    }
+    }*/
 
     // caso general: reequilibrar al hijo indiceHijoHijo
     /*Nodo* h = subraiz->hijo[indiceHijoHijo];
@@ -179,73 +238,76 @@ void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int indiceHijoHijo) {
 }
 
 
-
-
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Redistribuir(Nodo* padre, int indiceHijo) {
     std::cout << "Redistribucion" << std::endl;
     Nodo* h = padre->hijo[indiceHijo];
     bool hijoHoja = EsHoja(h);
 
-    // izquierdo
-    if (indiceHijo > 0) {
-        std::cout << "Redistribuyendo a la izquierda" << std::endl;
-        Nodo* izquierdo = padre->hijo[indiceHijo - 1];
+    // INTENTAR REDISTRIBUIR EN CASCADA A LA IZQUIERDA
+    for (int i = indiceHijo - 1; i >= 0; --i) {
+        Nodo* izquierdo = padre->hijo[i];
         if (izquierdo->elemNodo < grado) {
-            // mover p->claves[indiceHijo-1] → L
-            izquierdo->claves[izquierdo->elemNodo] = padre->claves[indiceHijo - 1];
+            std::cout << "Redistribuyendo en cascada hacia la izquierda con el hijo[" << i << "]\n";
+
+            // Mover la clave del padre hacia el final del izquierdo
+            izquierdo->claves[izquierdo->elemNodo] = padre->claves[i];
+
             if (!hijoHoja)
-                izquierdo->hijo[izquierdo->elemNodo + 1] = h->hijo[0];
+                izquierdo->hijo[izquierdo->elemNodo + 1] = padre->hijo[i + 1]->hijo[0];
             izquierdo->elemNodo++;
 
-            // subir h->claves[0] → p
-            padre->claves[indiceHijo - 1] = h->claves[0];
+            // Subir la primera clave del nodo h actual al padre
+            padre->claves[i] = h->claves[0];
 
-            // desplazar h
-            for (int i = 0; i < h->elemNodo - 1; ++i) {
-                h->claves[i] = h->claves[i + 1];
+            // Desplazar a la izquierda todas las claves e hijos en h
+            for (int j = 0; j < h->elemNodo - 1; ++j) {
+                h->claves[j] = h->claves[j + 1];
                 if (!hijoHoja)
-                    h->hijo[i] = h->hijo[i + 1];
+                    h->hijo[j] = h->hijo[j + 1];
             }
             if (!hijoHoja)
                 h->hijo[h->elemNodo - 1] = h->hijo[h->elemNodo];
             h->elemNodo--;
-            
-            if(izquierdo->elemNodo == grado && h->elemNodo == grado){
-                DividirTriple(h, indiceHijo);
-            } return;
-        }
-    }
 
-    // derecho
-    if (indiceHijo < padre->elemNodo) {
-        std::cout << "Redistribuyendo a la derecha" << std::endl;
-        Nodo* derecho = padre->hijo[indiceHijo + 1];
-        if (derecho->elemNodo < grado) {
-            // desplazar en R
-            for (int i = derecho->elemNodo; i > 0; --i) {
-                derecho->claves[i] = derecho->claves[i - 1];
-                if (!hijoHoja)
-                    derecho->hijo[i + 1] = derecho->hijo[i];
-            }
-            if (!hijoHoja)
-                derecho->hijo[1] = derecho->hijo[0];
-
-            // mover p->claves[indiceHijo] → R[0]
-            derecho->claves[0] = padre->claves[indiceHijo];
-            if (!hijoHoja)
-                derecho->hijo[0] = h->hijo[h->elemNodo];
-            derecho->elemNodo++;
-
-            // subir h->claves[last] → p
-            padre->claves[indiceHijo] = h->claves[h->elemNodo - 1];
-            h->elemNodo--;
             return;
         }
     }
 
+    // SI NO SE PUDO A LA IZQUIERDA, INTENTAR REDISTRIBUIR A LA DERECHA
+    for (int i = indiceHijo + 1; i <= padre->elemNodo; ++i) {
+        Nodo* derecho = padre->hijo[i];
+        if (derecho->elemNodo < grado) {
+            std::cout << "Redistribuyendo hacia la derecha con el hijo[" << i << "]\n";
+
+            // Desplazar claves e hijos del derecho a la derecha
+            for (int j = derecho->elemNodo; j > 0; --j) {
+                derecho->claves[j] = derecho->claves[j - 1];
+                if (!hijoHoja)
+                    derecho->hijo[j + 1] = derecho->hijo[j];
+            }
+            if (!hijoHoja)
+                derecho->hijo[1] = derecho->hijo[0];
+
+            // Mover clave del padre a derecho[0]
+            derecho->claves[0] = padre->claves[i - 1];
+            if (!hijoHoja)
+                derecho->hijo[0] = h->hijo[h->elemNodo];
+            derecho->elemNodo++;
+
+            // Subir la última clave de h al padre
+            padre->claves[i - 1] = h->claves[h->elemNodo - 1];
+            h->elemNodo--;
+
+            return;
+        }
+    }
+
+    // SI NO SE PUDO REDISTRIBUIR, HACER DIVISIÓN TRIPLE
+    std::cout << "No se pudo redistribuir, dividiendo triple" << std::endl;
     DividirTriple(padre, indiceHijo);
 }
+
 
 
 template <typename Type, int grado>
