@@ -80,6 +80,11 @@ template <typename Type, int grado>
 void StarBTree<Type, grado>::Agregar(Type valor){
     if (raiz == nullptr) raiz = new Nodo(/*true, true*/);  // raíz y hoja
 
+    if(Buscar(valor)){
+        std::cout << "El valor " << valor << " ya existe en el árbol" << std::endl;
+        return;
+    }
+
     Agregar(valor, raiz);
 }
 
@@ -159,7 +164,7 @@ void StarBTree<Type, grado>::OrdenarNodo(Nodo* subraiz, int indiceHijoHijo) {
         nueva->hijo[1] = derecho;
 
         delete subraiz;
-        raiz = nueva;
+        raiz = nueva; 
         return;
     }
 
@@ -187,6 +192,10 @@ void StarBTree<Type, grado>::Redistribuir(Nodo* padre, int indiceHijo) {
     std::cout << "Redistribucion" << std::endl;
     Nodo* h = padre->hijo[indiceHijo];
     bool hijoHoja = EsHoja(h);
+
+    if(h->elemNodo < grado){
+        std::cout << "Advertencia: Se intento redistribuir un nodo que aùn no se llena" << std::endl;
+    } 
 
     // INTENTAR REDISTRIBUIR EN CASCADA A LA IZQUIERDA
     for (int i = indiceHijo - 1; i >= 0; --i) {
@@ -379,6 +388,27 @@ bool StarBTree<Type, grado>::EsHoja(Nodo* nodo) const {
     return true;
 }
 
+
+template <typename Type, int grado>
+bool StarBTree<Type, grado>::Buscar(Type valor) const {
+    return Buscar(valor, raiz);
+}
+
+template <typename Type, int grado>
+bool StarBTree<Type, grado>::Buscar(Type valor, Nodo* subraiz) const {
+    if(subraiz == nullptr) return false;
+    
+    int i = 0;
+    while(i < subraiz->elemNodo && valor > subraiz->claves[i]) {
+        ++i;
+    }
+    
+    if(i < subraiz->elemNodo && valor == subraiz->claves[i]) {
+        return true;
+    }
+    
+    return Buscar(valor, subraiz->hijo[i]);
+}
 
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Vaciar() {

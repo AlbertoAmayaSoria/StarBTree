@@ -41,6 +41,7 @@ private:
     void Agregar(Type valor, Nodo* subraiz);
     void Eliminar(Type valor, Nodo* subraiz);
     void Vaciar(Nodo* nodo);
+    bool Buscar(Type valor, Nodo* subraiz) const;
 
     // Complementos para Agregar y Eliminar
     bool EsHoja(Nodo* nodo) const;

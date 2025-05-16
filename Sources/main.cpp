@@ -16,10 +16,17 @@ int main() {
 
     arbol.ImprimirNiveles();
 
+    std::cout << "---------------------------" << std::endl;
+    std::cout << "Hay elemento 20? ";
+    if(arbol.Buscar(20)){
+        std::cout << "Si se encontro el elemento 20" << std::endl;
+    } else std::cout << "No se encontro el elemento 20" << std::endl;
+
     arbol.Vaciar();
 
-    std::cout << "Vaciar";
+    std::cout << "Vaciando.. " << std::endl;
     arbol.ImprimirNiveles();
+    std::cout << "Elementos en el arbol despues de vaciar " << arbol.CantElem();
 
     return 0;
 }
