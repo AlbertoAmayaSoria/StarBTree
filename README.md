@@ -7,7 +7,7 @@ El Árbol B\* es una variante optimizada del Árbol B. Su principal objetivo es 
 ## Características
 
 - Altura balanceada.
-- Todos los datos están en nodos hoja.
+- Los datos estan distribuidos por los nodos del árbol.
 - Redistribuye claves antes de dividir.
 - Utiliza una estrategia de división triple para optimizar la estructura.
 - Mejor aprovechamiento del espacio (cercano al 2/3 del nodo lleno).
