@@ -12,7 +12,7 @@ int main() {
     for(int i = 1 ; i <= 8 ; ++i){
         arbol.Agregar(i);
     }
-    arbol.ImprimirNiveles();
+    //arbol.ImprimirNiveles();
     /*do {
         cout << "\n===== Menú del Árbol B* =====" << endl;
         cout << "1. Agregar elemento" << endl;

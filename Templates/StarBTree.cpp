@@ -83,6 +83,8 @@ void StarBTree<Type, grado>::Agregar(Type valor) {
     if(raiz == nullptr){
         raiz = new Nodo();
         raiz->EsRaiz = true;
+        raiz->MaxClaves = grado * 2;
+        raiz->Padre = nullptr;
         //delete raiz->claves;
         //delete raiz->hijo;
         
@@ -92,9 +94,6 @@ void StarBTree<Type, grado>::Agregar(Type valor) {
         for(int i = 0 ; i < grado * 2 + 1 ; ++i){
             raiz->hijo[i] = nullptr;
         }
-    
-        //raiz->claves[0] = valor;
-        //std::cout << "Insertando el valor: " << valor << std::endl;
     }
 
     Agregar(valor, raiz);
@@ -106,10 +105,24 @@ void StarBTree<Type, grado>::Agregar(Type valor) {
  */
 template <typename Type, int grado>
 void StarBTree<Type, grado>::Agregar(Type valor, Nodo* subraiz) {
-    if(EsHoja(subraiz)) {
-        //Implementar el ordenar mientras se agrega
-        subraiz->claves[subraiz->elemNodo] = valor;
+    int i = subraiz->elemNodo - 1;
+
+    if (EsHoja(subraiz)) {
+        // Inserción en hoja
+        while (i >= 0 && valor < subraiz->claves[i]) {
+            subraiz->claves[i + 1] = subraiz->claves[i];
+            --i;
+        }
+        subraiz->claves[i + 1] = valor;
         subraiz->elemNodo++;
+        cantElem++;
+        ImprimirNiveles(); //Para pruebas
+
+        // Si la hoja se llena, y es raiz, hay que reequilibrar
+        if (subraiz->MaxClaves && subraiz == raiz) {
+            std::cout << "El nodo raiz esta lleno" << std::endl;
+            //OrdenarNodo(subraiz, i + 1);
+        }
     }
 }
 

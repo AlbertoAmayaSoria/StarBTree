@@ -27,6 +27,7 @@ private:
     struct Nodo {
         int elemNodo;
         bool EsRaiz;
+        int MaxClaves;
         Nodo* Padre;
         //Type claves[grado];
         Type* claves;
