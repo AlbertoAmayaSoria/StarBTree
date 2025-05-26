@@ -26,14 +26,19 @@ private:
     int cantElem;
     struct Nodo {
         int elemNodo;
-        Type claves[grado];
-        Nodo* hijo[grado + 1];
+        bool EsRaiz;
+        Nodo* Padre;
+        //Type claves[grado];
+        Type* claves;
+        //Nodo* hijo[grado + 1];
+        Nodo** hijo;
         
-        Nodo() : elemNodo(0) {
+        /*Nodo() : elemNodo(0) {
             for(int i = 0; i <= grado; ++i) {
                 hijo[i] = nullptr;
             }
-        }
+        }*/
+        Nodo() : elemNodo(0), claves(nullptr), hijo(nullptr), EsRaiz(false), Padre(nullptr) {}
     } *raiz;
 
     // Métodos auxiliares privados
@@ -43,11 +48,7 @@ private:
     void Vaciar(Nodo* nodo);
     bool Buscar(Type valor, Nodo* subraiz) const;
 
-    // Complementos para Agregar y Eliminar
     bool EsHoja(Nodo* nodo) const;
-    void OrdenarNodo(Nodo* subraiz, int indiceHijo);
-    void Redistribuir(Nodo* subraiz, int indiceHijo);
-    void DividirTriple(Nodo* subraiz, int indiceHijo);
 
     // Métodos para impresión
     void ImprimirAsc(Nodo* nodo) const;

@@ -7,9 +7,13 @@ int main() {
     // Creamos un árbol B* de tipo int con grado 4
     StarBTree<int, 4> arbol;
 
-    int opcion, valor;
+    //int opcion, valor;
 
-    do {
+    for(int i = 1 ; i <= 8 ; ++i){
+        arbol.Agregar(i);
+    }
+    arbol.ImprimirNiveles();
+    /*do {
         cout << "\n===== Menú del Árbol B* =====" << endl;
         cout << "1. Agregar elemento" << endl;
         cout << "2. Eliminar elemento" << endl;
@@ -69,7 +73,7 @@ int main() {
                 cout << "Opción inválida. Intente de nuevo." << endl;
                 break;
         }
-    } while(opcion != 9);
+    } while(opcion != 9);*/
 
     return 0;
 }
